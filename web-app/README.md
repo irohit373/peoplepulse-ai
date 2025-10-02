@@ -1,8 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
-First, run the development server:
+we are using pnpm instead of npm because of its performance and efficient package management.
+
+if pnpm in not installed globally, you can install it via npm:
+
+```bash
+npm install -g pnpm
+```
+
+Then run the following command to install the dependencies:
+
+```bash
+cd web-app
+pnpm install
+```
+For running the development server:
 
 ```bash
 npm run dev
@@ -14,23 +26,24 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+I added daisyUI in the dependencies, so don't worry to add it and added the Daisy MCP server yeah help karega github copilot ko code likhne mein aur daisy ui ke components ko samajhne mein. taki tum chat mein daisy ui se acche se code mangwa sako (maybe complicated for you, if smj na aayein toh contact kareh) . Below is the link to daisy ui documentation and editor.
+https://daisyui.com/docs/editor/
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Now go through the nextJS lecture
+then go with the tailwindcss(if you want maybe u don't want it) and then with the daisyUI lec it don't take a lot of time and then play with the code.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+now u should create a new branch for your work
 
-## Learn More
+```bash
+git checkout -b your-branch-name (esha-ui)
+```
 
-To learn more about Next.js, take a look at the following resources:
+and start building and don't forget to commit your changes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+git add .
+git commit -m "your commit message"
+git push origin your-branch-name (esha-ui)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
