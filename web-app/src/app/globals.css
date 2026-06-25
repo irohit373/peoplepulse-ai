@@ -1,13 +1,386 @@
 @import "tailwindcss";
 @plugin "daisyui";
+@custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --color-primary: #8b5cf6;
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --signature-purple: #7c3aed;
+  --signature-cyan: #06b6d4;
+  --signature-emerald: #10b981;
+  --signature-gradient: linear-gradient(
+    90deg,
+    var(--signature-purple) 0%,
+    var(--signature-cyan) 52%,
+    var(--signature-emerald) 100%
+  );
+  --surface-light: rgba(255, 255, 255, 0.52);
+  --surface-dark: rgba(10, 10, 10, 0.42);
+  --section-border-light: rgba(124, 58, 237, 0.18);
+  --section-border-dark: rgba(255, 255, 255, 0.14);
+  --section-glow-light: 0 0 0 1px rgba(255, 255, 255, 0.3), 0 20px 50px rgba(6, 182, 212, 0.1);
+  --section-glow-dark: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 24px 56px rgba(16, 185, 129, 0.12);
+
+  /* DaisyUI overrides for our theme */
+  --color-primary: #7c3aed;
   --color-primary-content: #ffffff;
-  --color-secondary: #a78bfa;
-  --color-accent: #c4b5fd;
+  --color-secondary: #06b6d4;
+  --color-accent: #10b981;
   --color-neutral: #1f2937;
   --color-base-100: #ffffff;
-  --color-base-200: #f3f4f6;
+  --color-base-200: #f8f8f8;
   --color-base-300: #e5e7eb;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+body {
+  background: #ffffff;
+  color: #000000;
+}
+
+html.dark body {
+  background: #000000;
+  color: #ffffff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: color-mix(in srgb, #06b6d4 24%, white);
+  color: black;
+}
+
+html.dark ::selection {
+  background: color-mix(in srgb, #7c3aed 38%, black);
+  color: white;
+}
+
+/* Scroll Progress Bar */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+  background: var(--signature-gradient);
+  box-shadow: 0 0 18px rgba(6, 182, 212, 0.45);
+}
+
+/* Section Cards (glass-morphism) */
+.section-card {
+  background: var(--surface-light);
+  border-color: var(--section-border-light);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--section-glow-light);
+  transition: transform 280ms ease-in-out, box-shadow 280ms ease-in-out, border-color 280ms ease-in-out, background-color 280ms ease-in-out;
+}
+
+html.dark .section-card {
+  background: var(--surface-dark);
+  border-color: var(--section-border-dark);
+  box-shadow: var(--section-glow-dark);
+}
+
+.section-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgba(124, 58, 237, 0.18),
+    0 24px 60px rgba(6, 182, 212, 0.18);
+}
+
+/* Reveal Animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 700ms ease, transform 700ms ease;
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 980px) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Gradient Text */
+.gradient-text {
+  background-image: var(--signature-gradient);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-shift 10s ease infinite;
+}
+
+@keyframes gradient-shift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+/* Project Cards */
+.project-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--signature-gradient);
+}
+
+/* Pill Tags */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 10px;
+}
+
+html.dark .pill {
+  border-color: color-mix(in srgb, white 30%, transparent);
+  background: color-mix(in srgb, white 8%, transparent);
+}
+
+/* Contact Links */
+.contact-link-gradient {
+  position: relative;
+}
+
+.contact-link-gradient::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--signature-gradient);
+  transform: scaleX(0.35);
+  transform-origin: left center;
+  transition: transform 220ms ease;
+}
+
+.contact-link-gradient:hover::after,
+.contact-link-gradient:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Skills Tape Marquee Area */
+.skills-tape-pill {
+  display: inline-flex;
+  border: 2px solid #000;
+  background: #fff;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #000;
+  transition: transform 300ms, background 300ms, color 300ms;
+}
+
+html.dark .skills-tape-pill {
+  border-color: #fff;
+  background: #000;
+  color: #fff;
+}
+
+.skills-tape-pill:hover {
+  transform: translateY(-4px);
+  background: #000;
+  color: #fff;
+}
+
+html.dark .skills-tape-pill:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* Fade Up Animation */
+.fade-up {
+  animation: fade-up 820ms ease both;
+}
+
+.fade-up:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Timeline */
+.timeline-item {
+  position: relative;
+  padding: 0 0 36px 28px;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--signature-purple);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--signature-purple) 30%, transparent);
+}
+
+.timeline-item::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 4px;
+  bottom: -8px;
+  width: 1px;
+  background: color-mix(in srgb, currentColor 20%, transparent);
+}
+
+.timeline-item:last-child::after {
+  display: none;
+}
+
+/* Nav links in sticky header */
+.sticky-nav a {
+  display: inline-flex;
+  border-radius: 999px;
+  background: transparent;
+  font-family: monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 8px 11px;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease;
+  color: color-mix(in srgb, currentColor 60%, transparent);
+}
+
+.sticky-nav a:hover,
+.sticky-nav a.is-active,
+.sticky-nav a[aria-current="page"] {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: inherit;
+}
+
+/* Highlight panel (hero stats panel) */
+.highlight-panel {
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  padding: 22px;
+  transition: transform 220ms ease, border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+}
+
+.highlight-panel:hover {
+  transform: translateY(-3px);
+}
+
+.highlight-panel p {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.62;
+}
+
+.highlight-panel p + p {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
+
+/* Skill Cards */
+.zed-card {
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  padding: 22px;
+  transition: transform 220ms ease, border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+}
+
+.zed-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Site Footer */
+.site-footer {
+  width: min(calc(100% - 32px), 1200px);
+  margin: 40px auto 0;
+  padding: 28px 0 42px;
+  border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  font-family: monospace;
+  font-size: 0.76rem;
+  color: color-mix(in srgb, currentColor 50%, transparent);
+}
+
+/* Section Headings */
+.section-label {
+  margin: 0 0 12px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+/* Force DaisyUI dark mode to work with our .dark class */
+html.dark .bg-base-100 { background-color: #111112 !important; }
+html.dark .bg-base-200 { background-color: #1a1a1c !important; }
+html.dark .bg-base-300 { background-color: #252527 !important; }
+html.dark .border-base-300 { border-color: #333 !important; }
+html.dark .text-base-content { color: #e5e5e5 !important; }
