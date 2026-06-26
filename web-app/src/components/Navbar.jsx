@@ -3,78 +3,81 @@
 import Link from "next/link";
 import { useUser } from "@/providers/UserProvider";
 import UserDropdown from "./UserDropdown";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 
 export default function Navbar() {
   const user = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [theme, setTheme] = useState('light');
+  const { resolvedTheme, setTheme } = useTheme();
+  const isThemeReady = typeof resolvedTheme === "string";
 
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-  }, []);
-
-  // Toggle theme function
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
+    if (!isThemeReady) return;
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/signin';
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/signin";
   };
 
   return (
     <>
-      <nav className="navbar bg-base-100 border-b px-4 lg:px-8 sticky top-0 z-40 shadow-sm backdrop-blur-sm bg-base-100/95">
-        <div className="flex-1">
-          <Link href="/" className="btn btn-ghost gap-2 text-lg font-bold">
-            <img src="/favicon.ico" alt="Logo" className="w-8 h-8" />
-            <span className="hidden sm:inline bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              VELOCITY H
+      <nav className="sticky top-0 z-40 border-b border-black/10 bg-white/85 px-4 py-2 backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-black/85 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="inline-flex items-center gap-2">
+            <span className="text-[10px] font-black uppercase tracking-[0.24em] text-purple-600 dark:text-purple-400">
+              velocity h
             </span>
           </Link>
-        </div>
 
-        {/* Desktop Navigation */}
-        <div className="flex-none hidden lg:flex gap-2">
-          <Link href="/jobs" className="btn btn-ghost">
-            Jobs
-          </Link>
+          {/* Desktop Nav */}
+          <div className="hidden items-center gap-3 md:flex">
+            <Link
+              href="/jobs"
+              className="rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-black/60 transition-colors hover:bg-black/5 hover:text-black dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+            >
+              Jobs
+            </Link>
 
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="rounded-full border-2 border-black bg-white px-2.5 py-1 text-sm leading-none transition-transform hover:-translate-y-0.5 dark:border-white dark:bg-black"
+              aria-label="Toggle dark mode"
+              disabled={!isThemeReady}
+            >
+              {isThemeReady ? (resolvedTheme === "dark" ? "☀️" : "🌙") : "◐"}
+            </button>
+
+            {user ? (
+              <UserDropdown user={user} />
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/signup"
+                  className="rounded-full border-2 border-black px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider transition-colors hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
+                >
+                  Sign Up
+                </Link>
+                <Link
+                  href="/signin"
+                  className="rounded-full border-2 border-black bg-black px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black dark:border-white dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white"
+                >
+                  Login
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
           <button
-            onClick={toggleTheme}
-            className="btn btn-ghost btn-square"
-            aria-label="Toggle theme"
-          >
-            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
-            
-          {user ? (
-            <UserDropdown user={user} />
-          ) : (
-            <div className="flex gap-2">
-              <Link href="/signup" className="btn btn-ghost">
-                Sign Up
-              </Link>
-              <Link href="/signin" className="btn btn-primary">
-                Login
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Mobile Menu Button */}
-        <div className="flex-none lg:hidden">
-          <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="btn btn-ghost btn-sm btn-square"
+            className="flex items-center md:hidden"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -84,105 +87,103 @@ export default function Navbar() {
 
       {/* Full Screen Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-white z-50 lg:hidden overflow-y-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white">
-            <div className="flex items-center gap-2">
-              <img src="/favicon.ico" alt="Logo" className="w-8 h-8" />
-              <span className="text-lg font-bold text-gray-900">VELOCITY H</span>
-            </div>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-white dark:bg-black md:hidden">
+          <div className="flex items-center justify-between border-b border-black/10 px-4 py-4 dark:border-white/10">
+            <span className="text-[10px] font-black uppercase tracking-[0.24em] text-purple-600 dark:text-purple-400">
+              velocity h
+            </span>
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 hover:bg-gray-100 rounded-lg"
+              className="p-2"
             >
-              <X size={24} className="text-gray-700" />
+              <X size={24} />
             </button>
           </div>
 
-          {/* Menu Content */}
-          <div className="p-6 bg-white">
+          <div className="space-y-2 p-6">
             <Link
               href="/jobs"
-              className="block px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium mb-2"
+              className="block rounded-lg px-4 py-3 font-black uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/10"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Jobs
+              Browse Jobs
             </Link>
 
-            {/* Theme Toggle */}
             <button
+              type="button"
               onClick={() => {
                 toggleTheme();
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium mb-2"
+              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 font-black uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/10"
             >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-              <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+              {isThemeReady && (resolvedTheme === "dark" ? "☀️" : "🌙")}
+              <span>{isThemeReady && (resolvedTheme === "dark" ? "Light Mode" : "Dark Mode")}</span>
             </button>
 
             {user ? (
               <>
-                <div className="pt-6 pb-2">
-                  <p className="px-4 text-xs font-semibold text-gray-500 uppercase">Account</p>
+                <div className="border-t border-black/10 pt-6 dark:border-white/10">
+                  <p className="px-4 text-[10px] font-black uppercase tracking-widest opacity-50">
+                    Account
+                  </p>
                 </div>
-                
-                <div className="p-4 bg-gray-100 rounded-lg mb-3">
-                  <div className="font-semibold text-gray-900">{user.name || 'User'}</div>
-                  <div className="text-sm text-gray-600">{user.email}</div>
+
+                <div className="mx-4 mt-3 rounded-lg border border-black/10 p-4 dark:border-white/10">
+                  <p className="font-bold">{user.name || "User"}</p>
+                  <p className="text-sm opacity-60">{user.email}</p>
                 </div>
-                
+
                 <Link
                   href="/dashboard"
-                  className="block px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium mb-2"
+                  className="block rounded-lg px-4 py-3 font-bold hover:bg-black/5 dark:hover:bg-white/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
-                
                 <Link
                   href="/dashboard/recruitment"
-                  className="block px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium mb-2"
+                  className="block rounded-lg px-4 py-3 font-bold hover:bg-black/5 dark:hover:bg-white/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Recruitment
                 </Link>
-                
                 <Link
                   href="/dashboard/scheduling"
-                  className="block px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium mb-2"
+                  className="block rounded-lg px-4 py-3 font-bold hover:bg-black/5 dark:hover:bg-white/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Scheduling
                 </Link>
-                
+
                 <button
+                  type="button"
                   onClick={() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg font-medium mt-2"
+                  className="mt-4 block w-full rounded-lg px-4 py-3 text-left font-black uppercase tracking-wider text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <>
+              <div className="mt-6 space-y-3">
                 <Link
                   href="/signup"
-                  className="block px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium mb-2 mt-6"
+                  className="block rounded-lg border-2 border-black px-4 py-3 text-center font-black uppercase tracking-wider dark:border-white"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Sign Up
                 </Link>
-                
                 <Link
                   href="/signin"
-                  className="block px-4 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-medium text-center"
+                  className="block rounded-lg border-2 border-black bg-black px-4 py-3 text-center font-black uppercase tracking-wider text-white dark:border-white dark:bg-white dark:text-black"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>
