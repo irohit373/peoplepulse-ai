@@ -1,496 +1,573 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Lenis from "lenis";
-import { useTheme } from "next-themes";
-import {
-  Briefcase, Users, Sparkles, Star, Target, CheckCircle,
-  ArrowRight, Rocket, Brain, Zap, BarChart3, Clock, Shield,
-  ChevronRight, Award, Calendar, Mail, Search, Filter,
-  TrendingUp
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
+import { 
+  Briefcase, Users, TrendingUp, Sparkles, Zap, Target, 
+  Clock, CheckCircle, BarChart3, Calendar, Mail, Brain,
+  Shield, Rocket, Award, Star, ChevronRight, ArrowRight
 } from "lucide-react";
+import animationData from "../../public/lottie_animation/animation-02/watermelon-pack-animation-02.json";
 
-const navItems = [
-  { label: "Platform", href: "#platform" },
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Contact", href: "#contact" },
-];
-
-const quickStats = [
-  { label: "Jobs Posted", value: "10K+" },
-  { label: "Happy Candidates", value: "5K+" },
-  { label: "Time Saved", value: "80%" },
-  { label: "Success Rate", value: "95%" },
-];
-
-const highlights = [
-  "Built AI-first products that reduced time-to-hire by nearly 60%.",
-  "ML-powered resume scoring with top candidate match accuracy.",
-  "Automated interview scheduling with Google Calendar sync.",
-];
-
-const features = [
-  {
-    icon: Brain,
-    title: "AI Candidate Scoring",
-    desc: "ML-powered analysis ranks applicants by fit. No more manual resume screening.",
-    color: "#7c3aed",
-  },
-  {
-    icon: Calendar,
-    title: "Smart Scheduling",
-    desc: "Auto-schedule interviews with Google Calendar. Candidates pick their slot.",
-    color: "#06b6d4",
-  },
-  {
-    icon: BarChart3,
-    title: "Analytics Pipeline",
-    desc: "Real-time recruitment funnel insights. Know exactly where every candidate is.",
-    color: "#10b981",
-  },
-  {
-    icon: Mail,
-    title: "Email Automation",
-    desc: "Automated candidate communications from application to offer letter.",
-    color: "#f59e0b",
-  },
-  {
-    icon: Search,
-    title: "Resume Parser",
-    desc: "Extract skills, experience, and education from any PDF resume automatically.",
-    color: "#7c3aed",
-  },
-  {
-    icon: Filter,
-    title: "Job Matching",
-    desc: "Intelligent matching algorithm surfaces the best candidates for every role.",
-    color: "#06b6d4",
-  },
-];
-
-const steps = [
-  {
-    icon: Target,
-    title: "Post Jobs",
-    desc: "Create detailed job postings with AI-generated descriptions and requirements.",
-    step: "01",
-  },
-  {
-    icon: Zap,
-    title: "Screen Automatically",
-    desc: "AI scores every resume against your criteria. Top matches surface first.",
-    step: "02",
-  },
-  {
-    icon: Rocket,
-    title: "Hire Faster",
-    desc: "Schedule interviews, collaborate with your team, and extend offers — all in one place.",
-    step: "03",
-  },
-];
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 export default function Home() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const isThemeReady = typeof resolvedTheme === "string";
-  const [activeSection, setActiveSection] = useState("#home");
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const lenisRef = useRef(null);
-
-  // Track scroll for progress bar and sticky nav state
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Intersection observer for active nav section
-  useEffect(() => {
-    const sectionIds = navItems.map((item) => item.href);
-    const sectionElements = sectionIds
-      .map((href) => document.querySelector(href))
-      .filter(Boolean);
-
-    if (!sectionElements.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries.filter((entry) => entry.isIntersecting);
-        if (!visibleEntries.length) return;
-
-        const topMost = visibleEntries.sort(
-          (a, b) => b.intersectionRatio - a.intersectionRatio
-        )[0];
-        if (topMost?.target?.id) {
-          setActiveSection(`#${topMost.target.id}`);
-        }
-      },
-      {
-        root: null,
-        rootMargin: "-24% 0px -58% 0px",
-        threshold: [0.18, 0.32, 0.5],
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3
       }
-    );
-
-    sectionElements.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
-
-  // Scroll progress bar
-  useEffect(() => {
-    const handleScrollProgress = () => {
-      const scrollHeight =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const nextProgress = scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
-      setScrollProgress(Math.min(Math.max(nextProgress, 0), 1));
-    };
-
-    handleScrollProgress();
-    window.addEventListener("scroll", handleScrollProgress, { passive: true });
-    window.addEventListener("resize", handleScrollProgress);
-
-    return () => {
-      window.removeEventListener("scroll", handleScrollProgress);
-      window.removeEventListener("resize", handleScrollProgress);
-    };
-  }, []);
-
-  // Reveal animations
-  useEffect(() => {
-    const revealElements = Array.from(document.querySelectorAll(".reveal"));
-    if (!revealElements.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        rootMargin: "0px 0px -10% 0px",
-        threshold: 0.18,
-      }
-    );
-
-    revealElements.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Lenis smooth scroll
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 0.78,
-      wheelMultiplier: 1.08,
-      touchMultiplier: 1.1,
-      smoothWheel: true,
-      syncTouch: false,
-    });
-    lenisRef.current = lenis;
-
-    let rafId;
-    const raf = (time) => {
-      lenis.raf(time);
-      rafId = window.requestAnimationFrame(raf);
-    };
-
-    rafId = window.requestAnimationFrame(raf);
-
-    return () => {
-      window.cancelAnimationFrame(rafId);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, []);
-
-  const toggleTheme = () => {
-    if (!isThemeReady) return;
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+    }
   };
 
-  const handleSmoothNav = (event, href) => {
-    if (!href.startsWith("#")) return;
-
-    const target = document.querySelector(href);
-    if (!target) return;
-
-    event.preventDefault();
-    setActiveSection(href);
-
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(target, { duration: 0.62, offset: -88 });
-    } else {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 100 }
     }
-
-    window.history.replaceState(null, "", href);
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 text-black transition-colors dark:text-white md:px-6 md:py-10">
-      {/* Scroll Progress Bar */}
-      <div
-        className="scroll-progress-bar"
-        style={{ transform: `scaleX(${scrollProgress})` }}
-        aria-hidden="true"
-      />
+    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-base-100 via-base-200 to-base-100">
+      {/* Hero Section - Candidate Focused */}
+      <div className="relative hero min-h-[calc(100vh-3.5rem)] bg-gradient-to-br from-primary/10 via-base-100 to-secondary/10 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 90, 0],
+              opacity: [0.03, 0.05, 0.03]
+            }}
+            transition={{ duration: 20, repeat: Infinity }}
+            className="absolute -top-1/2 -left-1/4 w-96 h-96 bg-primary rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              rotate: [0, -90, 0],
+              opacity: [0.03, 0.06, 0.03]
+            }}
+            transition={{ duration: 25, repeat: Infinity }}
+            className="absolute -bottom-1/2 -right-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl"
+          />
+        </div>
 
-      {/* Sticky Nav */}
-      <div className="sticky top-3 z-40 mb-5 flex flex-col gap-3 border border-black/10 bg-white/65 px-3 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-black/45 sm:flex-row sm:items-center sm:justify-between md:mb-8">
-        <Link
-          href="/"
-          className="inline-flex w-fit border border-black/20 bg-white/70 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] backdrop-blur dark:border-white/30 dark:bg-black/40"
-        >
-          velocity h
-        </Link>
-        <div className="sticky-nav flex flex-wrap items-center gap-1">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              onClick={(event) => handleSmoothNav(event, item.href)}
-              aria-current={activeSection === item.href ? "page" : undefined}
-              className={activeSection === item.href ? "is-active" : ""}
+        <div className="hero-content max-w-7xl mx-auto px-4 py-12 lg:py-0 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+            
+            {/* Left Column - Hero Text */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              className="text-center lg:text-left space-y-6"
             >
-              {item.label}
-            </a>
-          ))}
-          <Link
-            href="/jobs"
-            className="ml-1 border border-black/20 bg-black px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black dark:border-white/40 dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white"
-          >
-            Browse Jobs
-          </Link>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="ml-1 border-2 border-black bg-white px-3 py-1 text-lg leading-none transition-transform hover:-translate-y-0.5 dark:border-white dark:bg-black"
-            aria-label="Toggle dark mode"
-            disabled={!isThemeReady}
-          >
-            {isThemeReady ? (resolvedTheme === "dark" ? "☀️" : "🌙") : "◐"}
-          </button>
+              <motion.div variants={itemVariants} className="space-y-3">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="badge badge-primary badge-lg gap-2 shadow-lg"
+                >
+                  <Sparkles size={16} className="animate-pulse" />
+                  AI-Powered Job Matching
+                </motion.div>
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight">
+                  Land Your{" "}
+                  <motion.span
+                    animate={{ 
+                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                    }}
+                    transition={{ duration: 5, repeat: Infinity }}
+                    className="bg-gradient-to-r from-primary via-secondary to-accent bg-[length:200%_auto] bg-clip-text text-transparent"
+                  >
+                    Dream Career
+                  </motion.span>
+                  <br />
+                  <span className="text-4xl sm:text-5xl lg:text-6xl opacity-80">Today!</span>
+                </h1>
+              </motion.div>
+              
+              <motion.p variants={itemVariants} className="text-lg sm:text-xl opacity-70 max-w-lg mx-auto lg:mx-0">
+                Discover your perfect career match with our AI-powered platform. 
+                <span className="text-primary font-semibold"> Find opportunities</span> that align with your skills and aspirations.
+              </motion.p>
+              
+              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href="/jobs" className="btn btn-primary btn-lg gap-2 shadow-lg">
+                    <Briefcase size={20} />
+                    Explore Opportunities
+                    <ArrowRight size={20} />
+                  </Link>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href="/signup" className="btn btn-outline btn-lg gap-2">
+                    <Rocket size={20} />
+                    Get Started Free
+                  </Link>
+                </motion.div>
+              </motion.div>
+
+              {/* Animated Stats */}
+              <motion.div 
+                variants={itemVariants}
+                className="stats stats-vertical sm:stats-horizontal shadow-xl bg-base-100/80 backdrop-blur-sm w-full border border-base-300 overflow-hidden"
+              >
+                <motion.div 
+                  whileHover={{ scale: 1.05, backgroundColor: "rgba(139, 92, 246, 0.1)" }}
+                  className="stat place-items-center"
+                >
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="stat-value text-primary text-3xl"
+                  >
+                    500+
+                  </motion.div>
+                  <div className="stat-desc font-semibold">Active Jobs</div>
+                </motion.div>
+                <motion.div 
+                  whileHover={{ scale: 1.05, backgroundColor: "rgba(167, 139, 250, 0.1)" }}
+                  className="stat place-items-center"
+                >
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, delay: 0.2, repeat: Infinity }}
+                    className="stat-value text-secondary text-3xl"
+                  >
+                    2K+
+                  </motion.div>
+                  <div className="stat-desc font-semibold">Happy Candidates</div>
+                </motion.div>
+                <motion.div 
+                  whileHover={{ scale: 1.05, backgroundColor: "rgba(196, 181, 253, 0.1)" }}
+                  className="stat place-items-center"
+                >
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, delay: 0.4, repeat: Infinity }}
+                    className="stat-value text-accent text-3xl"
+                  >
+                    95%
+                  </motion.div>
+                  <div className="stat-desc font-semibold">Success Rate</div>
+                </motion.div>
+              </motion.div>
+
+              {/* Trust Badges */}
+              <motion.div variants={itemVariants} className="flex items-center gap-4 justify-center lg:justify-start flex-wrap">
+                <div className="flex items-center gap-2 text-sm opacity-70">
+                  <CheckCircle size={16} className="text-success" />
+                  <span>Trusted Platform</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm opacity-70">
+                  <Shield size={16} className="text-info" />
+                  <span>100% Secure</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm opacity-70">
+                  <Star size={16} className="text-warning" />
+                  <span>4.9/5 Rating</span>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Right Column - Animation */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
+              className="flex justify-center lg:justify-end relative"
+            >
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="w-full max-w-md lg:max-w-lg relative"
+              >
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary to-secondary rounded-full blur-2xl opacity-20 animate-pulse" />
+                <Lottie animationData={animationData} loop autoplay />
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section
-        id="home"
-        className="section-card reveal relative overflow-hidden border-2 border-black px-6 py-10 transition-colors dark:border-white md:px-10 md:py-16 lg:min-h-[86vh] lg:py-20"
-      >
-        {/* Background Glows */}
-        <div
-          className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-purple-300/40 blur-3xl dark:bg-purple-400/20"
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-cyan-300/35 blur-3xl dark:bg-cyan-500/20"
-          aria-hidden="true"
-        />
-
-        <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:gap-10">
-          <div>
-            <p className="fade-up mb-4 text-[11px] font-black uppercase tracking-[0.28em] text-purple-600 dark:text-purple-400">
-              AI Recruitment Platform
+      {/* How It Works - For Candidates */}
+      <div className="bg-gradient-to-b from-base-100 to-base-200 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.div
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center"
+            >
+              <Target className="text-white" size={32} />
+            </motion.div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Your Journey to <span className="text-primary">Success</span>
+            </h2>
+            <p className="text-lg opacity-70 max-w-2xl mx-auto">
+              Get hired in 3 simple steps. We make job hunting effortless!
             </p>
-            <h1 className="fade-up gradient-text text-5xl font-black uppercase leading-[0.86] tracking-tighter md:text-7xl lg:text-8xl">
-              Hire Smarter
-              <br />
-              Ship Faster
-            </h1>
-            <p className="fade-up mt-4 text-sm font-bold leading-loose md:text-base">
-              AI-powered recruitment SaaS that screens candidates, scores resumes, and schedules
-              interviews — cutting your hiring cycle by up to 60%.
-            </p>
+          </motion.div>
 
-            <div className="fade-up mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/signup"
-                className="border-2 border-black bg-black px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black dark:border-white dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: Briefcase, title: "Browse Jobs", desc: "Explore 500+ opportunities tailored to your skills", bgColor: "bg-primary", badgeColor: "badge-primary", step: "01" },
+              { icon: Zap, title: "Apply Instantly", desc: "One-click applications with AI-optimized profiles", bgColor: "bg-secondary", badgeColor: "badge-secondary", step: "02" },
+              { icon: Rocket, title: "Get Hired", desc: "Fast-track interviews with top companies", bgColor: "bg-accent", badgeColor: "badge-accent", step: "03" }
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.2 }}
+                whileHover={{ scale: 1.05, rotate: 1 }}
+                className="relative"
               >
-                Get Started Free
-                <ArrowRight size={14} className="ml-1 inline" />
-              </Link>
-              <Link
-                href="/jobs"
-                className="border-2 border-black px-5 py-3 text-xs font-black uppercase tracking-wider transition-colors hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
-              >
-                Browse Openings
-                <Briefcase size={14} className="ml-1 inline" />
-              </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="fade-up mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {quickStats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="border border-black/10 p-3 text-center dark:border-white/10"
-                >
-                  <p className="gradient-text text-2xl font-black md:text-3xl">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1 text-[10px] font-black uppercase tracking-widest opacity-60">
-                    {stat.label}
-                  </p>
+                <div className="card bg-base-100 shadow-2xl border-2 border-primary/10 hover:border-primary transition-all overflow-hidden">
+                  <div className="absolute top-0 right-0 text-8xl font-bold opacity-5">
+                    {item.step}
+                  </div>
+                  <div className="card-body items-center text-center relative z-10">
+                    <motion.div
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6 }}
+                      className={`w-20 h-20 rounded-2xl ${item.bgColor} flex items-center justify-center mb-4 shadow-lg`}
+                    >
+                      <item.icon className="text-white" size={40} />
+                    </motion.div>
+                    <div className={`badge ${item.badgeColor} badge-lg mb-2`}>{item.step}</div>
+                    <h3 className="card-title text-2xl">{item.title}</h3>
+                    <p className="opacity-70">{item.desc}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Highlights Panel */}
-          <div className="highlight-panel">
-            {highlights.map((item) => (
-              <p key={item}>{item}</p>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Platform Section */}
-      <section
-        id="platform"
-        className="section-card reveal mt-6 border-2 border-black p-6 transition-colors dark:border-white md:p-8"
-      >
-        <p className="section-label">Platform</p>
-        <h2 className="mb-5 text-3xl font-black uppercase tracking-tight">
-          Complete Recruitment SaaS
-        </h2>
-        <p className="font-bold leading-loose">
-          From posting jobs to extending offers — a single platform for the entire hiring pipeline.
-          Built with AI at the core to eliminate busywork and surface the best candidates.
-        </p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { icon: Briefcase, label: "Job Posting", desc: "AI-assisted job descriptions with smart tagging" },
-            { icon: Users, label: "Applicant Tracking", desc: "Full pipeline management with drag-and-drop stages" },
-            { icon: Brain, label: "AI Scoring", desc: "ML resume analysis with match percentage" },
-            { icon: Calendar, label: "Scheduling", desc: "Auto-sync interviews via Google Calendar" },
-          ].map((item) => (
-            <div key={item.label} className="zed-card">
-              <item.icon size={24} className="mb-3 text-purple-600 dark:text-purple-400" />
-              <h3 className="text-base font-black uppercase tracking-tight">{item.label}</h3>
-              <p className="mt-2 text-sm opacity-70">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section
-        id="features"
-        className="section-card reveal mt-6 border-2 border-black p-6 transition-colors dark:border-white md:p-8"
-      >
-        <p className="section-label">Features</p>
-        <h2 className="mb-5 text-3xl font-black uppercase tracking-tight">
-          Everything You Need
-        </h2>
-        <p className="mb-8 font-bold leading-loose">
-          No more switching between spreadsheets, email, and calendar apps. Everything lives here.
-        </p>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="project-card reveal border-2 border-black/10 p-5 transition-colors dark:border-white/10"
-              style={{ "--accent-color": feature.color }}
-            >
-              <feature.icon size={28} className="mb-3" style={{ color: feature.color }} />
-              <h3 className="text-base font-black uppercase tracking-tight">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed opacity-70">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section
-        id="how-it-works"
-        className="section-card reveal mt-6 border-2 border-black p-6 transition-colors dark:border-white md:p-8"
-      >
-        <p className="section-label">How It Works</p>
-        <h2 className="mb-5 text-3xl font-black uppercase tracking-tight">
-          3 Steps to Faster Hiring
-        </h2>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {steps.map((step) => (
-            <div key={step.step} className="zed-card">
-              <p className="mb-2 text-4xl font-black text-purple-600/30 dark:text-purple-400/30">
-                {step.step}
-              </p>
-              <step.icon size={28} className="mb-3 text-cyan-500" />
-              <h3 className="text-xl font-black uppercase tracking-tight">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed opacity-70">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section
-        id="contact"
-        className="section-card reveal mt-6 border-2 border-black p-6 transition-colors dark:border-white md:p-8"
-      >
-        <p className="section-label">Get Started</p>
-        <h2 className="mb-4 text-3xl font-black uppercase tracking-tight">
-          Ready to Ship Faster?
-        </h2>
-        <p className="font-bold leading-loose">
-          Join 500+ companies using Velocity H to streamline their recruitment. Free to start,
-          no credit card required.
-        </p>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href="/signup"
-            className="contact-link-gradient border-2 border-black px-5 py-3 text-xs font-black uppercase tracking-wider transition-colors hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
+      {/* For HR - Platform Features */}
+      <div className="bg-gradient-to-br from-base-200 via-base-100 to-base-200 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
           >
-            Create Free Account
-            <ArrowRight size={14} className="ml-1 inline" />
-          </Link>
-          <Link
-            href="/signin"
-            className="border-2 border-black px-5 py-3 text-xs font-black uppercase tracking-wider transition-colors hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
-          >
-            Sign In
-          </Link>
-        </div>
+            <div className="badge badge-primary badge-lg gap-2 mb-4">
+              <Users size={16} />
+              For HR Professionals
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Complete <span className="text-primary">Recruitment SaaS</span> Platform
+            </h2>
+            <p className="text-lg opacity-70 max-w-2xl mx-auto">
+              Everything you need to hire top talent, powered by AI and designed for efficiency
+            </p>
+          </motion.div>
 
-        <div className="mt-5 flex flex-wrap gap-2 text-sm">
-          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-            <CheckCircle size={14} />
-            Free plan available
-          </span>
-          <span className="flex items-center gap-1 text-cyan-600 dark:text-cyan-400">
-            <Shield size={14} />
-            Enterprise-grade security
-          </span>
-          <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
-            <Star size={14} />
-            4.9/5 from HR teams
-          </span>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[10px] font-black uppercase tracking-[0.24em]">velocity h</p>
-          <p>© 2026 Velocity H. All rights reserved.</p>
-          <div className="flex gap-4 text-[10px] font-black uppercase tracking-wider">
-            <a href="https://github.com/irohit373/Velocity-HR" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href="mailto:deshmukhrohit373@gmail.com">Contact</a>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: Brain, title: "AI Candidate Scoring", desc: "Automatically rank applicants with ML-powered analysis", color: "primary" },
+              { icon: Calendar, title: "Smart Scheduling", desc: "Auto-schedule interviews with Google Calendar integration", color: "secondary" },
+              { icon: BarChart3, title: "Analytics Dashboard", desc: "Real-time insights into your recruitment pipeline", color: "accent" },
+              { icon: Mail, title: "Email Automation", desc: "Automated candidate communications at every stage", color: "info" },
+              { icon: Shield, title: "Secure & Compliant", desc: "Enterprise-grade security with data encryption", color: "success" },
+              { icon: Clock, title: "Save 80% Time", desc: "Reduce time-to-hire with automated workflows", color: "warning" }
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="group"
+              >
+                <div className={`card bg-base-100 shadow-xl hover:shadow-2xl transition-all border-l-4 border-${feature.color} h-full border border-base-300`}>
+                  <div className="card-body">
+                    <motion.div
+                      whileHover={{ rotate: [0, -10, 10, 0] }}
+                      transition={{ duration: 0.5 }}
+                      className={`w-14 h-14 rounded-xl bg-${feature.color}/10 flex items-center justify-center mb-3 group-hover:bg-${feature.color}/20 transition-colors`}
+                    >
+                      <feature.icon className={`text-${feature.color}`} size={28} />
+                    </motion.div>
+                    <h3 className="card-title text-lg">{feature.title}</h3>
+                    <p className="opacity-70 text-sm">{feature.desc}</p>
+                    <div className="card-actions mt-2">
+                      <motion.div
+                        whileHover={{ x: 5 }}
+                        className={`flex items-center gap-1 text-${feature.color} text-sm font-semibold cursor-pointer`}
+                      >
+                        Learn more <ChevronRight size={16} />
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </footer>
-    </main>
+      </div>
+
+      {/* Benefits Section */}
+      <div className="bg-gradient-to-b from-base-200 to-base-100 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="badge badge-secondary badge-lg gap-2 mb-4">
+                <Award size={16} />
+                Why Choose Us
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+                The Smartest Way to <span className="text-primary">Recruit</span>
+              </h2>
+              <div className="space-y-4">
+                {[
+                  "AI-powered candidate matching with 95% accuracy",
+                  "Reduce hiring time from weeks to days",
+                  "Automated scheduling with calendar sync",
+                  "Real-time collaboration with your team",
+                  "Data-driven insights for better decisions",
+                  "24/7 support from recruitment experts"
+                ].map((benefit, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ x: 10 }}
+                    className="flex items-center gap-3"
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: 360 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center flex-shrink-0"
+                    >
+                      <CheckCircle className="text-success" size={18} />
+                    </motion.div>
+                    <span className="text-lg">{benefit}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { value: "10K+", label: "Jobs Posted", icon: Briefcase, color: "primary" },
+                  { value: "5K+", label: "Companies", icon: Users, color: "secondary" },
+                  { value: "80%", label: "Time Saved", icon: Clock, color: "accent" },
+                  { value: "4.9★", label: "User Rating", icon: Star, color: "warning" }
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+                    whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.15, type: "spring" }}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    className="card bg-base-100 shadow-xl border-2 border-primary/20"
+                  >
+                    <div className="card-body items-center text-center p-6">
+                      <stat.icon size={32} className={`mb-2 text-${stat.color}`} />
+                      <motion.div
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className={`text-4xl font-bold text-${stat.color}`}
+                      >
+                        {stat.value}
+                      </motion.div>
+                      <div className="text-sm opacity-70">{stat.label}</div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials */}
+      <div className="bg-base-200 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Loved by <span className="text-primary">Thousands</span>
+            </h2>
+            <p className="text-lg opacity-70">See what our users have to say</p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: { staggerChildren: 0.15 }
+              }
+            }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
+            {[
+              { name: "Sarah Johnson", role: "Software Engineer", text: "Found my dream job in just 2 weeks! The AI matching is incredible.", rating: 5 },
+              { name: "Michael Chen", role: "HR Manager", text: "Cut our hiring time by 70%. Best recruitment tool we've ever used!", rating: 5 },
+              { name: "Emily Davis", role: "Product Designer", text: "The interview scheduling feature saved me so much time. Highly recommend!", rating: 5 }
+            ].map((testimonial, i) => (
+              <motion.div
+                key={i}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="card bg-base-100 shadow-2xl border border-base-300"
+              >
+                <div className="card-body">
+                  <div className="flex gap-1 mb-3">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ scale: 0, rotate: -180 }}
+                        whileInView={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        viewport={{ once: true }}
+                      >
+                        <Star className="text-warning fill-warning" size={20} />
+                      </motion.div>
+                    ))}
+                  </div>
+                  <p className="italic opacity-80 mb-4">"{testimonial.text}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="avatar placeholder">
+                      <div className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center">
+                        <span className="text-xl">{testimonial.name[0]}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">{testimonial.name}</div>
+                      <div className="text-sm opacity-60">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Final CTA Section */}
+      <div className="relative hero bg-gradient-to-br from-primary via-secondary to-accent py-24 overflow-hidden">
+        {/* Animated Background */}
+        <motion.div
+          animate={{
+            backgroundPosition: ["0% 0%", "100% 100%"],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{ duration: 15, repeat: Infinity }}
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
+            backgroundSize: "50px 50px"
+          }}
+        />
+
+        <div className="hero-content text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl"
+          >
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 5, repeat: Infinity }}
+              className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
+            >
+              <Rocket className="text-white" size={40} />
+            </motion.div>
+            
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+              Your Dream Job Awaits!
+            </h2>
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Join <span className="font-bold">10,000+</span> professionals who discovered amazing career opportunities. 
+              Your perfect role is just one click away!
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link href="/signup" className="btn btn-lg bg-white text-primary hover:bg-base-100 gap-2 shadow-2xl">
+                  <Rocket size={20} />
+                  Start Your Journey
+                  <ArrowRight size={20} />
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link href="/jobs" className="btn btn-lg btn-outline text-white border-white hover:bg-white hover:text-primary gap-2">
+                  <Briefcase size={20} />
+                  Explore Opportunities
+                </Link>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="mt-8 flex items-center justify-center gap-6 text-white/80 text-sm flex-wrap"
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle size={16} />
+                <span>100% Free Platform</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Shield size={16} />
+                <span>Secure & Private</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star size={16} />
+                <span>Trusted by Thousands</span>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
   );
 }

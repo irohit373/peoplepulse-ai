@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { LayoutDashboard, Briefcase, Calendar, Settings, LogOut } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { User, LayoutDashboard, Briefcase, Calendar, Settings, LogOut } from 'lucide-react';
 
 export default function UserDropdown({ user }) {
   const router = useRouter();
@@ -25,68 +25,67 @@ export default function UserDropdown({ user }) {
 
   return (
     <div className="dropdown dropdown-end">
-      <div
-        tabIndex={0}
-        role="button"
-        className="flex h-8 w-8 cursor-pointer items-center justify-center border-2 border-black text-[10px] font-black uppercase tracking-wider dark:border-white"
-      >
-        {getInitials(user.name, user.email)}
+      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+        <div className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+          <span className="text-sm font-semibold">{getInitials(user.name, user.email)}</span>
+        </div>
       </div>
-
-      <ul
+      
+      <motion.ul
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.15 }}
         tabIndex={0}
-        className="menu dropdown-content right-0 z-50 mt-2 w-56 border-2 border-black bg-white p-2 shadow-lg dark:border-white dark:bg-black"
+        className="menu dropdown-content bg-base-100 rounded-box z-50 mt-3 w-56 p-2 shadow border"
       >
-        {/* User Info Header */}
-        <li className="menu-title px-3 py-2">
-          <div className="space-y-1">
-            <p className="text-xs font-black uppercase tracking-wider">
-              {user.name || 'User'}
-            </p>
-            <p className="text-[10px] opacity-60">{user.email}</p>
+        <li className="menu-title">
+          <div className="flex gap-2">
+            <User size={16} />
+            <div>
+              <div className="font-semibold">{user.name || 'User'}</div>
+              <div className="text-xs opacity-70">{user.email}</div>
+            </div>
           </div>
         </li>
-
-        <div className="my-1 border-t border-black/10 dark:border-white/10" />
-
+        
+        <div className="divider my-1"></div>
+        
+        {/* Menu Items */}
         <li>
-          <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-xs font-bold hover:bg-black/5 dark:hover:bg-white/10">
-            <LayoutDashboard size={16} />
-            Dashboard
-          </Link>
+          <a onClick={() => router.push('/dashboard')} className="gap-3">
+            <LayoutDashboard size={18} />
+            <span>Dashboard</span>
+          </a>
         </li>
         <li>
-          <Link href="/dashboard/recruitment" className="flex items-center gap-3 px-3 py-2 text-xs font-bold hover:bg-black/5 dark:hover:bg-white/10">
-            <Briefcase size={16} />
-            Recruitment
-          </Link>
+          <a onClick={() => router.push('/dashboard/recruitment')} className="gap-3">
+            <Briefcase size={18} />
+            <span>Recruitment</span>
+          </a>
         </li>
         <li>
-          <Link href="/dashboard/scheduling" className="flex items-center gap-3 px-3 py-2 text-xs font-bold hover:bg-black/5 dark:hover:bg-white/10">
-            <Calendar size={16} />
-            Scheduling
-          </Link>
+          <a onClick={() => router.push('/dashboard/scheduling')} className="gap-3">
+            <Calendar size={18} />
+            <span>Scheduling</span>
+          </a>
         </li>
         <li>
-          <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2 text-xs font-bold hover:bg-black/5 dark:hover:bg-white/10">
-            <Settings size={16} />
-            Settings
-          </Link>
+          <a onClick={() => router.push('/dashboard/settings')} className="gap-3">
+            <Settings size={18} />
+            <span>Settings</span>
+          </a>
         </li>
-
-        <div className="my-1 border-t border-black/10 dark:border-white/10" />
-
+        
+        <div className="divider my-1"></div>
+        
         <li>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex w-full items-center gap-3 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
+          <a onClick={handleLogout} className="text-error gap-3">
+            <LogOut size={18} />
+            <span>Logout</span>
+          </a>
         </li>
-      </ul>
+      </motion.ul>
     </div>
   );
 }

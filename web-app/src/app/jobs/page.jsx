@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Search, Filter, X } from 'lucide-react';
 import JobCard from '@/components/jobs/JobCard';
 import JobCardSkeleton from '@/components/JobCardSkeleton';
@@ -57,148 +58,215 @@ export default function JobsPage() {
   const hasActiveFilters = searchTerm || filters.location || filters.minExperience || filters.maxExperience;
 
   return (
-    <div className="section-card mx-auto mt-6 max-w-6xl border-2 border-black p-6 dark:border-white md:p-8">
-      {/* Header */}
-      <div className="mb-6 text-center">
-        <p className="section-label">Opportunities</p>
-        <h1 className="gradient-text text-5xl font-black uppercase leading-[0.86] tracking-tighter md:text-6xl">
-          Open Positions
-        </h1>
-        <p className="mt-3 font-bold opacity-70">
-          Find your next career move
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-100 py-12 px-4 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0],
+            opacity: [0.03, 0.05, 0.03]
+          }}
+          transition={{ duration: 20, repeat: Infinity }}
+          className="absolute top-1/4 -left-1/4 w-96 h-96 bg-primary rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            rotate: [0, -90, 0],
+            opacity: [0.03, 0.06, 0.03]
+          }}
+          transition={{ duration: 25, repeat: Infinity }}
+          className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl"
+        />
       </div>
 
-      {/* Search & Filters */}
-      <div className="mb-6 border-2 border-black/10 p-4 dark:border-white/10">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          {/* Search Input */}
-          <div className="flex flex-1 items-center gap-2 border-2 border-black/20 px-3 py-2 dark:border-white/20">
-            <Search size={18} className="opacity-50" />
-            <input
-              type="text"
-              className="flex-1 bg-transparent text-sm font-bold outline-none"
-              placeholder="Search by title, location, skills..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="text-xs opacity-50 hover:opacity-100"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-4xl sm:text-5xl font-bold mb-2">
+            Discover Your Next <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Opportunity</span>
+          </h1>
+          <p className="text-lg sm:text-xl opacity-70">Explore opportunities that match your skills and aspirations</p>
+        </motion.div>
 
-          <button
-            type="button"
-            className={`flex items-center gap-2 border-2 px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-colors ${
-              showFilters
-                ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
-                : 'border-black/30 dark:border-white/30'
-            }`}
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={16} />
-            Filters
-            {hasActiveFilters && <span className="ml-1 inline-block h-2 w-2 rounded-full bg-purple-500" />}
-          </button>
-        </div>
-
-        {/* Filter Panel */}
-        {showFilters && (
-          <div className="mt-4 border-t border-black/10 pt-4 dark:border-white/10">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div>
-                <label className="mb-1 block text-[10px] font-black uppercase tracking-widest">Location</label>
+        {/* Search & Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="card bg-base-100 shadow-2xl border border-base-300 mb-6"
+        >
+          <div className="card-body p-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Search Input */}
+              <label className="input input-bordered flex items-center gap-2 flex-1">
+                <Search size={20} />
                 <input
                   type="text"
-                  placeholder="e.g., Remote, Mumbai"
-                  className="w-full border-2 border-black/20 bg-transparent px-3 py-2 text-sm font-bold outline-none dark:border-white/20"
-                  value={filters.location}
-                  onChange={(e) => setFilters({...filters, location: e.target.value})}
+                  className="grow"
+                  placeholder="Search by job title, location, or skills..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
-              </div>
-              <div>
-                <label className="mb-1 block text-[10px] font-black uppercase tracking-widest">Min Experience (years)</label>
-                <input
-                  type="number"
-                  placeholder="0"
-                  min="0"
-                  className="w-full border-2 border-black/20 bg-transparent px-3 py-2 text-sm font-bold outline-none dark:border-white/20"
-                  value={filters.minExperience}
-                  onChange={(e) => setFilters({...filters, minExperience: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-[10px] font-black uppercase tracking-widest">Max Experience (years)</label>
-                <input
-                  type="number"
-                  placeholder="20"
-                  min="0"
-                  className="w-full border-2 border-black/20 bg-transparent px-3 py-2 text-sm font-bold outline-none dark:border-white/20"
-                  value={filters.maxExperience}
-                  onChange={(e) => setFilters({...filters, maxExperience: e.target.value})}
-                />
-              </div>
-            </div>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                className="mt-3 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider opacity-60 hover:opacity-100"
-                onClick={clearFilters}
+              </label>
+
+              {/* Filter Toggle */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`btn ${showFilters ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setShowFilters(!showFilters)}
               >
-                <X size={14} /> Clear Filters
-              </button>
+                <Filter size={20} />
+                Filters
+                {hasActiveFilters && <span className="badge badge-secondary">•</span>}
+              </motion.button>
+            </div>
+
+            {/* Filter Panel */}
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="divider my-2"></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <label className="form-control">
+                    <span className="label label-text">Location</span>
+                    <input
+                      type="text"
+                      placeholder="e.g., Remote, NYC"
+                      className="input input-bordered input-sm"
+                      value={filters.location}
+                      onChange={(e) => setFilters({...filters, location: e.target.value})}
+                    />
+                  </label>
+                  <label className="form-control">
+                    <span className="label label-text">Min Experience</span>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      min="0"
+                      className="input input-bordered input-sm"
+                      value={filters.minExperience}
+                      onChange={(e) => setFilters({...filters, minExperience: e.target.value})}
+                    />
+                  </label>
+                  <label className="form-control">
+                    <span className="label label-text">Max Experience</span>
+                    <input
+                      type="number"
+                      placeholder="20"
+                      min="0"
+                      className="input input-bordered input-sm"
+                      value={filters.maxExperience}
+                      onChange={(e) => setFilters({...filters, maxExperience: e.target.value})}
+                    />
+                  </label>
+                </div>
+                {hasActiveFilters && (
+                  <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    className="btn btn-ghost btn-sm self-end mt-2"
+                    onClick={clearFilters}
+                  >
+                    <X size={16} />
+                    Clear Filters
+                  </motion.button>
+                )}
+              </motion.div>
             )}
           </div>
+        </motion.div>
+
+        {/* Results Count */}
+        {!loading && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-center mb-6 opacity-70"
+          >
+            Showing <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", delay: 0.3 }}
+              className="text-primary font-semibold"
+            >{filteredJobs.length}</motion.span> of {jobs.length} opportunities
+          </motion.p>
+        )}
+
+        {/* Job Cards */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <JobCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filteredJobs.length > 0 ? (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.08,
+                  delayChildren: 0.2
+                }
+              }
+            }}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {filteredJobs.map((job) => (
+              <JobCard key={job.job_id} job={job} />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="text-center py-12"
+          >
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="mb-6"
+            >
+              <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                <Search size={40} className="text-primary" />
+              </div>
+            </motion.div>
+            <p className="text-lg opacity-50 mb-4">
+              {hasActiveFilters 
+                ? 'No opportunities match your criteria'
+                : 'No open positions at the moment'}
+            </p>
+            {hasActiveFilters && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn btn-primary"
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </motion.button>
+            )}
+          </motion.div>
         )}
       </div>
-
-      {/* Results Count */}
-      {!loading && (
-        <p className="mb-6 text-center text-[10px] font-black uppercase tracking-widest opacity-60">
-          Showing <span className="text-purple-600 dark:text-purple-400">{filteredJobs.length}</span> of {jobs.length} positions
-        </p>
-      )}
-
-      {/* Job Cards */}
-      {loading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <JobCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : filteredJobs.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredJobs.map((job) => (
-            <JobCard key={job.job_id} job={job} />
-          ))}
-        </div>
-      ) : (
-        <div className="py-12 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center border-2 border-black/20 dark:border-white/20">
-            <Search size={28} className="opacity-50" />
-          </div>
-          <p className="font-bold opacity-60">
-            {hasActiveFilters
-              ? 'No positions match your criteria'
-              : 'No open positions at the moment'}
-          </p>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              className="mt-4 border-2 border-black px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-colors hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
-              onClick={clearFilters}
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
